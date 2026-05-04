@@ -8,6 +8,7 @@ import { Save, Eye, Edit3, ChevronRight, Layout, Code, Target, BarChart3 } from 
 interface ThesisPresenterProps {
   thesis: Thesis;
   saving: boolean;
+  error: string | null;
   onUpdateSection: (sectionId: string, content: string) => void;
   onSave: () => void;
 }
@@ -22,6 +23,7 @@ const SECTION_ICONS: Record<string, React.ReactNode> = {
 export const ThesisPresenter: React.FC<ThesisPresenterProps> = ({
   thesis,
   saving,
+  error,
   onUpdateSection,
   onSave
 }) => {
@@ -53,10 +55,12 @@ export const ThesisPresenter: React.FC<ThesisPresenterProps> = ({
           <button
             onClick={onSave}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-2 rounded-full bg-black text-white hover:bg-gray-800 disabled:opacity-50 transition-all text-sm font-medium shadow-sm"
+            className={`flex items-center gap-2 px-6 py-2 rounded-full transition-all text-sm font-medium shadow-sm ${
+              error ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-black text-white hover:bg-gray-800'
+            } disabled:opacity-50`}
           >
             <Save className="w-4 h-4" />
-            {saving ? 'Guardando...' : 'Publicar Tesis'}
+            {saving ? 'Guardando...' : error ? 'Error (Reintentar)' : 'Publicar Tesis'}
           </button>
         </div>
       </header>

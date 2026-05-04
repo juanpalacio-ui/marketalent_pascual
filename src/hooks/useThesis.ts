@@ -6,12 +6,16 @@ export function useThesis(id: string) {
   const [thesis, setThesis] = useState<Thesis | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    thesisService.getThesis(id).then((data) => {
-      setThesis(data);
-      setLoading(false);
-    });
+    thesisService.getThesis(id)
+      .then((data) => {
+        setThesis(data);
+        setError(null);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   }, [id]);
 
   const updateSection = (sectionId: string, content: string) => {
@@ -27,12 +31,16 @@ export function useThesis(id: string) {
   const save = async () => {
     if (!thesis) return;
     setSaving(true);
+    setError(null);
     try {
-      await thesisService.saveThesis(thesis);
+      const savedThesis = await thesisService.saveThesis(thesis);
+      setThesis(savedThesis);
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setSaving(false);
     }
   };
 
-  return { thesis, loading, saving, updateSection, save };
+  return { thesis, loading, saving, error, updateSection, save };
 }
