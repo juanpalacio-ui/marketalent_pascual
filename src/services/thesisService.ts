@@ -1,4 +1,8 @@
 import { Thesis } from '../types/thesis';
+import { apiClient } from './apiClient';
+
+// Switch this to false when the FastAPI backend is ready
+const USE_MOCK = true;
 
 const MOCK_THESIS: Thesis = {
   id: '1',
@@ -34,17 +38,27 @@ const MOCK_THESIS: Thesis = {
 
 export const thesisService = {
   getThesis: async (id: string): Promise<Thesis> => {
-    // Simulating API call
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(MOCK_THESIS), 500);
-    });
+    if (USE_MOCK) {
+      return new Promise((resolve) => {
+        setTimeout(() => resolve(MOCK_THESIS), 500);
+      });
+    }
+    
+    const response = await apiClient.get<Thesis>(`/theses/${id}`);
+    return response.data;
   },
-  saveThesis: async (thesis: Thesis): Promise<void> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        console.log('Thesis saved:', thesis);
-        resolve();
-      }, 500);
-    });
+
+  saveThesis: async (thesis: Thesis): Promise<Thesis> => {
+    if (USE_MOCK) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          console.log('Mock Save:', thesis);
+          resolve(thesis);
+        }, 500);
+      });
+    }
+
+    const response = await apiClient.put<Thesis>(`/theses/${thesis.id}`, thesis);
+    return response.data;
   }
 };
